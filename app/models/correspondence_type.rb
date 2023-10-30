@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 class CorrespondenceType < ApplicationRecord
-  has_many :correspondences
+  has_many :correspondence
 end
