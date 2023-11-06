@@ -6,7 +6,9 @@ import { bindActionCreators } from 'redux';
 import Checkbox from '../../../../../components/Checkbox';
 import RadioField from '../../../../../components/RadioField';
 import ApiUtil from '../../../../../util/ApiUtil';
-import PaginationWrapper from '../../../CorrespondencePaginationWrapper';
+import {
+  loadCorrespondences
+} from '../../../correspondenceReducer/correspondenceActions';
 class AddCorrespondenceView extends React.Component {
 
 const RELATED_NO = '0';
