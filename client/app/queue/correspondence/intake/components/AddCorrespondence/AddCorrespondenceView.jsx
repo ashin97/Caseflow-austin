@@ -6,15 +6,8 @@ import { bindActionCreators } from 'redux';
 import Checkbox from '../../../../../components/Checkbox';
 import RadioField from '../../../../../components/RadioField';
 import ApiUtil from '../../../../../util/ApiUtil';
-import CorrespondencePaginationWrapper from '../../../CorrespondencePaginationWrapper';
-import {
-  loadCurrentCorrespondence,
-  loadCorrespondences,
-  loadVeteranInformation,
-  updateRadioValue,
-  saveCheckboxState,
-  clearCheckboxState
-} from '../../../correspondenceReducer/correspondenceActions';
+import PaginationWrapper from '../../../CorrespondencePaginationWrapper';
+class AddCorrespondenceView extends React.Component {
 
 const RELATED_NO = '0';
 const RELATED_YES = '1';
@@ -207,12 +200,11 @@ class AddCorrespondenceView extends React.Component {
         {this.props.radioValue === RELATED_YES && (
           <div className="cf-app-segment cf-app-segment--alt">
             <p>Please select the prior mail to link to this correspondence</p>
-            {/* <p>Viewing {this.props.correspondences.length} out of {this.props.correspondences.length} total</p> */}
             <div>
-              <CorrespondencePaginationWrapper
+              <PaginationWrapper
                 columns={this.getDocumentColumns}
                 columnsToDisplay={15}
-                rowObjects={this.props.correspondences}
+                rowObjects={this.state.rowObjects}
                 summary="Correspondence list"
                 className="correspondence-table"
                 headerClassName="cf-correspondence-list-header-row"
