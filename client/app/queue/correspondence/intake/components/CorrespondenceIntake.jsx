@@ -28,19 +28,15 @@ const progressBarSections = [
 
 export const CorrespondenceIntake = (props) => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isCheckboxSelected, setCheckboxSelected] = useState(false);
   const [isContinueEnabled, setContinueEnabled] = useState(true);
-  const [addTasksVisible, setAddTasksVisible] = useState(false);
-  const [submitCorrespondenceModalVisible, setSubmitCorrespondenceModalVisible] = useState(false);
-  const { pathname, hash, key } = useLocation();
-  const history = useHistory();
-  // For hash routing - Add element id and which step it lives on here
-  const SECTION_MAP = { 'task-not-related-to-an-appeal': 2 };
 
   const handleContinueStatusChange = (isEnabled) => {
     setContinueEnabled(isEnabled);
   };
 
   const handleCheckboxChange = (isSelected) => {
+    setCheckboxSelected(isSelected);
     setContinueEnabled(isSelected);
   };
 
