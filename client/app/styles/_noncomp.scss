@@ -1,5 +1,3 @@
-$validation-error-color: #cd2026;
-
 .cf-gray-box {
   background-color: $color-gray-lightest;
   border: 1px solid $color-gray-lighter;
@@ -212,7 +210,7 @@ $validation-error-color: #cd2026;
       }
 
       .decisionReviewTypeContainerError {
-        border-left: solid $validation-error-color 4px;
+        border-left: solid $color-secondary-dark 4px;
       }
 
       .report-page-multi-select-dropdown {
