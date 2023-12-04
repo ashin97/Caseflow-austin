@@ -91,7 +91,7 @@ ActiveRecord::Schema.define(version: 2023_11_30_210737) do
     t.boolean "appeal_docketed", default: false, null: false, comment: "When true, appeal has been docketed"
     t.bigint "appeal_id", null: false, comment: "AMA or Legacy Appeal ID"
     t.string "appeal_type", null: false, comment: "Appeal Type (Appeal or LegacyAppeal)"
-    t.datetime "created_at", null: false
+    t.datetime "created_at", null: false, comment: "Date and Time the record was inserted into the table"
     t.bigint "created_by_id", null: false, comment: "User id of the user that inserted the record"
     t.boolean "decision_mailed", default: false, null: false, comment: "When true, appeal has decision mail request complete"
     t.boolean "hearing_postponed", default: false, null: false, comment: "When true, appeal has hearing postponed and no hearings scheduled"
@@ -100,7 +100,7 @@ ActiveRecord::Schema.define(version: 2023_11_30_210737) do
     t.boolean "privacy_act_complete", default: false, null: false, comment: "When true, appeal has a privacy act request completed"
     t.boolean "privacy_act_pending", default: false, null: false, comment: "When true, appeal has a privacy act request still open"
     t.boolean "scheduled_in_error", default: false, null: false, comment: "When true, hearing was scheduled in error and none scheduled"
-    t.datetime "updated_at"
+    t.datetime "updated_at", comment: "Date and time the record was last updated"
     t.bigint "updated_by_id", comment: "User id of the last user that updated the record"
     t.boolean "vso_ihp_complete", default: false, null: false, comment: "When true, appeal has a VSO IHP request completed"
     t.boolean "vso_ihp_pending", default: false, null: false, comment: "When true, appeal has a VSO IHP request pending"
@@ -576,16 +576,20 @@ ActiveRecord::Schema.define(version: 2023_11_30_210737) do
     t.integer "conference_id", comment: "Id of the conference"
     t.datetime "created_at", null: false, comment: "Date and Time of creation"
     t.bigint "created_by_id", null: false, comment: "User id of the user who created the record. FK on User table"
+    t.datetime "deleted_at", comment: "Needed column to make use of the paranoia gem."
     t.string "guest_hearing_link", comment: "Guest link for hearing daily docket."
     t.string "guest_pin_long", comment: "Pin provided for the guest, allowing them entry into the video conference."
     t.bigint "hearing_day_id", null: false, comment: "The associated hearing day id"
     t.string "host_link", comment: "Conference link generated from external conference service"
     t.integer "host_pin", comment: "Pin for the host of the conference to get into the conference"
     t.string "host_pin_long", limit: 8, comment: "Generated host pin stored as a string"
+    t.string "type", comment: "Pexip or Webex conference link"
     t.datetime "updated_at", comment: "Date and Time record was last updated"
     t.bigint "updated_by_id", comment: "user id of the user to last update the record. FK on the User table"
     t.index ["created_by_id"], name: "index_created_by_id"
+    t.index ["deleted_at"], name: "index_conference_links_on_deleted_at"
     t.index ["hearing_day_id"], name: "index_conference_links_on_hearing_day_id"
+    t.index ["type"], name: "index_conference_links_on_type"
     t.index ["updated_by_id"], name: "index_updated_by_id"
   end
 
@@ -1224,6 +1228,13 @@ ActiveRecord::Schema.define(version: 2023_11_30_210737) do
     t.index ["request_issue_id"], name: "index_legacy_issues_on_request_issue_id"
   end
 
+  create_table "meeting_types", force: :cascade do |t|
+    t.bigint "conferenceable_id"
+    t.string "conferenceable_type"
+    t.integer "service_name", default: 0, comment: "Pexip or Webex Instant Connect"
+    t.index ["conferenceable_type", "conferenceable_id"], name: "conferenceable_association_idx"
+  end
+
   create_table "membership_requests", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "decided_at", comment: "The date and time when the deider user made a decision about the membership request"
@@ -1320,7 +1331,7 @@ ActiveRecord::Schema.define(version: 2023_11_30_210737) do
     t.string "appeals_type", null: false, comment: "Type of Appeal"
     t.datetime "created_at", comment: "Timestamp of when Noticiation was Created"
     t.boolean "email_enabled", default: true, null: false
-    t.string "email_notification_content", comment: "Full Email Text Content of Notification"
+    t.text "email_notification_content", comment: "Full Email Text Content of Notification"
     t.string "email_notification_external_id", comment: "VA Notify Notification Id for the email notification send through their API "
     t.string "email_notification_status", comment: "Status of the Email Notification"
     t.date "event_date", null: false, comment: "Date of Event"
@@ -1331,8 +1342,8 @@ ActiveRecord::Schema.define(version: 2023_11_30_210737) do
     t.string "participant_id", comment: "ID of Participant"
     t.string "recipient_email", comment: "Participant's Email Address"
     t.string "recipient_phone_number", comment: "Participants Phone Number"
-    t.string "sms_notification_content", comment: "Full SMS Text Content of Notification"
-    t.string "sms_notification_external_id", comment: "VA Notify Notification Id for the sms notification send through their API "
+    t.text "sms_notification_content", comment: "Full SMS Text Content of Notification"
+    t.string "sms_notification_external_id"
     t.string "sms_notification_status", comment: "Status of SMS/Text Notification"
     t.datetime "updated_at", comment: "TImestamp of when Notification was Updated"
     t.index ["appeals_id", "appeals_type"], name: "index_appeals_notifications_on_appeals_id_and_appeals_type"
