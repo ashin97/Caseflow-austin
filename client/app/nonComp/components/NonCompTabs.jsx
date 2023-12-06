@@ -86,7 +86,19 @@ const NonCompTabsUnconnected = (props) => {
     filter((key) => props.businessLineConfig.tabs.includes(key)).
     map((key) => ALL_TABS[key]);
 
+  const checkIfPageChanged = (value) => {
+    // If the user has selected a new tab then we should reset the pagination page to 0
+    // This is to prevent situations where Viewing 31-45 of 1 total gets displayed and prevents successful api requests
+    if (value !== getTabByIndex) {
+      tabPaginationOptions.page = 0;
+    }
+  };
+
+  // add tests for this but it works
+  // and cool since it should only affect our tasks table
+
   return (<TabWindow
+    onChange={((value) => checkIfPageChanged(value))}
     name="tasks-organization-queue"
     tabs={tabs}
     defaultPage={props.currentTab || getTabByIndex}
