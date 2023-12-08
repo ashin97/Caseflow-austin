@@ -28,12 +28,15 @@ class HearingTimeService
       remove_time_string_params(update_params).merge(scheduled_time: update_params[:scheduled_time_string])
     end
 
+    # Return scheduled_for for a legacy hearing in an acceptable format for VACOLS
     def legacy_formatted_scheduled_for(scheduled_for:, scheduled_time_string:)
-      hour, min = scheduled_time_string.split(":")
+      scheduled_time_in_utc = Time.zone.parse(scheduled_time_string)
+
       time = scheduled_for.to_datetime
+
       Time.use_zone(VacolsHelper::VACOLS_DEFAULT_TIMEZONE) do
         Time.zone.now.change(
-          year: time.year, month: time.month, day: time.day, hour: hour.to_i, min: min.to_i
+          year: time.year, month: time.month, day: time.day, hour: scheduled_time_in_utc.hour, min: scheduled_time_in_utc.min
         )
       end
     end

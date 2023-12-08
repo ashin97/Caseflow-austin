@@ -369,9 +369,12 @@ export const hearingTimeOptsWithZone = (options, local) =>
     // can also be removed.
     moment.tz.setDefault();
 
+    const displayLocalTime = local && localTime !== time;
+
     return {
       ...item,
-      [label]: local && localTime !== time ? `${localTime} / ${time}` : time
+      ['value']: displayLocalTime ? `${localTime}` : time,
+      [label]: displayLocalTime ? `${localTime} / ${time}` : time
     };
   });
 
@@ -399,8 +402,20 @@ export const timezones = (time, roTimezone) => {
   // Get the list of Regional Office Timezones
   const ros = roTimezones();
 
+  if (time !== undefined) {
+
+    const getAmTime = time.search("AM");
+    const splitTimeString = getAmTime < 0 ? time.search("PM") : getAmTime;
+
+    const selectedTime = splitTimeString == -1 ? time : time.slice(0,splitTimeString + 2).trim();
+    const selectedTimeZone = splitTimeString == -1 ? null : time.slice(splitTimeString + 2).trim();
+
+    time = selectedTime;
+    roTimezone = selectedTimeZone === null ? roTimezone : TIMEZONES[selectedTimeZone];
+  }
+
   // Convert the time into a date object with the RO timezone
-  const dateTime = moment.tz(time, 'HH:mm', roTimezone);
+  const dateTime = moment.tz(time, 'HH:mm A', roTimezone);
 
   // Map the available timeTIMEZONES to a select options object
   const unorderedOptions = Object.keys(TIMEZONES).map((zone) => {
