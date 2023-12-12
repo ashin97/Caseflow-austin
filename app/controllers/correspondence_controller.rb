@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class CorrespondenceController < ApplicationController
+  before_action :verify_correspondence_access
   before_action :verify_feature_toggle
   before_action :correspondence
   before_action :auto_texts
@@ -68,6 +69,7 @@ class CorrespondenceController < ApplicationController
       correspondence: correspondence,
       package_document_type: correspondence&.package_document_type,
       general_information: general_information,
+      current_user: current_user,
       correspondence_documents: corres_docs.map do |doc|
         WorkQueue::CorrespondenceDocumentSerializer.new(doc).serializable_hash[:data][:attributes]
       end
@@ -151,6 +153,12 @@ class CorrespondenceController < ApplicationController
         related_correspondence_id: Correspondence.find_by(uuid: uuid)&.id
       )
     end
+  end
+  
+  def verify_correspondence_access
+    return true if MailTeamSupervisor.singleton.user_has_access?(current_user) || MailTeam.singleton.user_has_access?(current_user)
+
+    redirect_to "/unauthorized"
   end
 
   def general_information
