@@ -21,9 +21,14 @@ import DateSelector from '../../../components/DateSelector';
 import ErrorAlert from '../../components/ErrorAlert';
 import { REQUEST_STATE, PAGE_PATHS, VBMS_BENEFIT_TYPES, FORM_TYPES } from '../../constants';
 import EP_CLAIM_TYPES from '../../../../constants/EP_CLAIM_TYPES';
-import { formatAddedIssues, formatRequestIssues, getAddIssuesFields, formatIssuesBySection } from '../../util/issues';
+import {
+  formatAddedIssues,
+  formatRequestIssues,
+  getAddIssuesFields,
+  formatLegacyAddedIssues,
+  formatIssuesBySection } from '../../util/issues';
 import Table from '../../../components/Table';
-import issueSectionRow from './issueSectionRow/issueSectionRow';
+import Alert from 'app/components/Alert';
 
 import {
   toggleAddDecisionDateModal,
@@ -34,12 +39,14 @@ import {
   removeIssue,
   withdrawIssue,
   setIssueWithdrawalDate,
+  setMstPactDetails,
   correctIssue,
   undoCorrection,
   toggleUnidentifiedIssuesModal,
   toggleIssueRemoveModal,
   toggleLegacyOptInModal,
-  toggleCorrectionTypeModal
+  toggleCorrectionTypeModal,
+  toggleEditIntakeIssueModal
 } from '../../actions/addIssues';
 import { editEpClaimLabel } from '../../../intakeEdit/actions/edit';
 import COPY from '../../../../COPY';
@@ -96,6 +103,12 @@ class AddIssuesPage extends React.Component {
     case 'undo_correction':
       this.props.undoCorrection(index);
       break;
+    case 'edit':
+      this.setState({
+        issueIndex: index
+      });
+      this.props.toggleEditIntakeIssueModal({ index });
+      break;
     default:
       this.props.undoCorrection(index);
     }
@@ -117,6 +130,9 @@ class AddIssuesPage extends React.Component {
 
   // eslint-disable-next-line class-methods-use-this
   requestIssuesWithoutDecisionDates(intakeData) {
+    if (intakeData.docketType === 'Legacy') {
+      return false;
+    }
     const requestIssues = formatRequestIssues(intakeData.requestIssues, intakeData.contestableIssues);
 
     return !requestIssues.every((issue) => issue.ratingIssueReferenceId ||
@@ -214,7 +230,9 @@ class AddIssuesPage extends React.Component {
       editPage,
       addingIssue,
       userCanWithdrawIssues,
-      userCanSplitAppeal
+      userCanEditIntakeIssues,
+      userCanSplitAppeal,
+      isLegacy
     } = this.props;
     const intakeData = intakeForms[formType];
     const appealInfo = intakeForms.appeal;
@@ -243,7 +261,10 @@ class AddIssuesPage extends React.Component {
         (issue) => VBMS_BENEFIT_TYPES.includes(issue.benefitType) || issue.ratingIssueReferenceId
       );
 
-    const issues = formatAddedIssues(intakeData.addedIssues, useAmaActivationDate);
+    // eslint-disable-next-line max-len
+    const issues = intakeData.docketType === 'Legacy' ? formatLegacyAddedIssues(intakeData.requestIssues, intakeData.addedIssues) :
+      formatAddedIssues(intakeData.addedIssues, useAmaActivationDate);
+
     const issuesPendingWithdrawal = issues.filter((issue) => issue.withdrawalPending);
     const issuesBySection = formatIssuesBySection(issues);
 
@@ -383,6 +404,40 @@ class AddIssuesPage extends React.Component {
       additionalRowClasses = (rowObj) => (rowObj.field === '' ? 'intake-issue-flash' : '');
     }
 
+    const issueSectionRow = (sectionIssues, fieldTitle) => {
+      const reviewHasPredocketVhaIssues = sectionIssues.some(
+        (issue) => issue.benefitType === 'vha' && issue.isPreDocketNeeded === 'true'
+      );
+      const showPreDocketBanner = !editPage && formType === 'appeal' && reviewHasPredocketVhaIssues;
+
+      return {
+        field: fieldTitle,
+        content: (
+          <div>
+            {endProductWithError && (
+              <ErrorAlert errorCode="unable_to_edit_ep" />
+            )}
+            { !fieldTitle.includes('issues') && <span><strong>Requested issues</strong></span> }
+            <IssueList
+              onClickIssueAction={this.onClickIssueAction}
+              withdrawReview={withdrawReview}
+              issues={sectionIssues}
+              intakeData={intakeData}
+              formType={formType}
+              featureToggles={featureToggles}
+              userCanWithdrawIssues={userCanWithdrawIssues}
+              userCanEditIntakeIssues={userCanEditIntakeIssues &&
+              (this.props.featureToggles.mst_identification ||
+              this.props.featureToggles.pact_identification ||
+              this.props.featureToggles.legacy_mst_pact_identification)}
+              editPage={editPage}
+            />
+            {showPreDocketBanner && <Alert message={COPY.VHA_PRE_DOCKET_ADD_ISSUES_NOTICE} type="info" />}
+          </div>
+        )
+      };
+    };
+
     const endProductLabelRow = (endProductCode, editDisabled) => {
       return {
         field: 'EP Claim Label',
@@ -451,7 +506,8 @@ class AddIssuesPage extends React.Component {
 
     additionalRowClasses = (rowObj) => (rowObj.field === '' ? 'intake-issue-flash' : '');
 
-    const hideAddIssueButton = intakeData.isDtaError && _.isEmpty(intakeData.contestableIssues);
+    const hideAddIssueButton = (intakeData.isDtaError && _.isEmpty(intakeData.contestableIssues)) ||
+      intakeData.docketType === 'Legacy';
 
     if (!hideAddIssueButton) {
       rowObjects = rowObjects.concat({
@@ -466,6 +522,7 @@ class AddIssuesPage extends React.Component {
           <AddIssueManager
             intakeData={intakeData}
             formType={formType}
+            userCanEditIntakeIssues={this.props.userCanEditIntakeIssues}
             featureToggles={featureToggles}
             editPage={editPage}
             onComplete={() => {
@@ -522,6 +579,26 @@ class AddIssuesPage extends React.Component {
             loading={this.state.loading}
           />
         )}
+        {intakeData.editIntakeIssueModalVisible && (
+          <EditIntakeIssueModal
+            issueIndex={this.state.issueIndex}
+            currentIssue ={this.props.intakeForms[this.props.formType].addedIssues[this.state.issueIndex]}
+            legacyIssues={issues}
+            appealIsLegacy={isLegacy}
+            mstIdentification={this.props.featureToggles.mst_identification}
+            pactIdentification={this.props.featureToggles.pact_identification}
+            justificationReason={this.props.featureToggles.justification_reason}
+            onCancel={() => {
+              this.props.toggleEditIntakeIssueModal();
+            }}
+            onSubmit={(issueProps) => {
+              this.props.setMstPactDetails({
+                issueProps,
+              });
+              this.props.toggleEditIntakeIssueModal();
+            }}
+          />
+        )}
         <h1 className="cf-txt-c">{messageHeader}</h1>
 
         {requestState === REQUEST_STATE.FAILED && (
@@ -566,6 +643,7 @@ AddIssuesPage.propTypes = {
   removeIssue: PropTypes.func,
   setIssueWithdrawalDate: PropTypes.func,
   toggleAddDecisionDateModal: PropTypes.func,
+  setMstPactDetails: PropTypes.func,
   toggleAddingIssue: PropTypes.func,
   toggleAddIssuesModal: PropTypes.func,
   toggleCorrectionTypeModal: PropTypes.func,
@@ -574,11 +652,14 @@ AddIssuesPage.propTypes = {
   toggleNonratingRequestIssueModal: PropTypes.func,
   toggleUnidentifiedIssuesModal: PropTypes.func,
   toggleUntimelyExemptionModal: PropTypes.func,
+  toggleEditIntakeIssueModal: PropTypes.func,
   undoCorrection: PropTypes.func,
   veteran: PropTypes.object,
   withdrawIssue: PropTypes.func,
   userCanWithdrawIssues: PropTypes.bool,
-  userCanSplitAppeal: PropTypes.bool
+  userCanEditIntakeIssues: PropTypes.bool,
+  userCanSplitAppeal: PropTypes.bool,
+  isLegacy: PropTypes.bool
 };
 
 export const IntakeAddIssuesPage = connect(
@@ -604,7 +685,8 @@ export const IntakeAddIssuesPage = connect(
         toggleLegacyOptInModal,
         removeIssue,
         withdrawIssue,
-        setIssueWithdrawalDate
+        setIssueWithdrawalDate,
+        setMstPactDetails
       },
       dispatch
     )
@@ -627,8 +709,9 @@ export const EditAddIssuesPage = connect(
     activeIssue: state.activeIssue,
     addingIssue: state.addingIssue,
     userCanWithdrawIssues: state.userCanWithdrawIssues,
-    userCanSplitAppeal: state.userCanSplitAppeal
-
+    userCanEditIntakeIssues: state.userCanEditIntakeIssues,
+    userCanSplitAppeal: state.userCanSplitAppeal,
+    isLegacy: state.isLegacy
   }),
   (dispatch) =>
     bindActionCreators(
@@ -637,9 +720,11 @@ export const EditAddIssuesPage = connect(
         toggleAddingIssue,
         toggleIssueRemoveModal,
         toggleCorrectionTypeModal,
+        toggleEditIntakeIssueModal,
         removeIssue,
         withdrawIssue,
         setIssueWithdrawalDate,
+        setMstPactDetails,
         correctIssue,
         undoCorrection,
         toggleUnidentifiedIssuesModal,
