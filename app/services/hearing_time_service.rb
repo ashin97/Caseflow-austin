@@ -22,21 +22,31 @@ class HearingTimeService
       remove_time_string_params(update_params).merge(scheduled_for: scheduled_for)
     end
 
-    def build_params_with_time(_hearing, update_params)
-      return update_params if update_params[:scheduled_time_string].nil?
+    def build_params_with_time(hearing, update_params)
+      return update_params if update_params[:scheduled_time].nil?
 
-      remove_time_string_params(update_params).merge(scheduled_time: update_params[:scheduled_time_string])
+      if (update_params[:scheduled_time].include?("AM"))
+        index = update_params[:scheduled_time].index("AM") + 2
+      else
+        index = update_params[:scheduled_time].index("PM") + 2
+      end
+
+      scheduled_time = update_params[:scheduled_time][0..index].strip
+      timezone = update_params[:scheduled_time][index..].strip
+      scheduled_time_in_utc = Time.use_zone(timezone){Time.zone.parse(scheduled_time)}.utc
+
+      remove_time_string_params(update_params).merge(scheduled_time: scheduled_time_in_utc)
     end
 
     # Return scheduled_for for a legacy hearing in an acceptable format for VACOLS
     def legacy_formatted_scheduled_for(scheduled_for:, scheduled_time_string:)
-      scheduled_time_in_utc = Time.zone.parse(scheduled_time_string)
+      scheduled_time_in_utc = Time.zone.parse(scheduled_time_string).utc
 
       time = scheduled_for.to_datetime
 
       Time.use_zone(VacolsHelper::VACOLS_DEFAULT_TIMEZONE) do
-        Time.zone.now.change(
-          year: time.year, month: time.month, day: time.day, hour: scheduled_time_in_utc.hour, min: scheduled_time_in_utc.min
+        Time.zone.parse(
+          "#{time.year}-#{time.month}-#{time.day} #{scheduled_time_in_utc.hour}:#{scheduled_time_in_utc.min} UTC"
         )
       end
     end

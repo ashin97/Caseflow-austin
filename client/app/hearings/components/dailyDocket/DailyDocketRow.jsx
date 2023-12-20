@@ -31,7 +31,8 @@ import {
   isPreviouslyScheduledHearing,
   pollVirtualHearingData,
   handleEdit,
-  userJudgeOrCoordinator
+  userJudgeOrCoordinator,
+  processHearingTime
 } from '../../utils';
 import { docketRowStyle, inputSpacing } from './style';
 import { onReceiveAlerts, onReceiveTransitioningAlert, transitionAlert } from '../../../components/common/actions';

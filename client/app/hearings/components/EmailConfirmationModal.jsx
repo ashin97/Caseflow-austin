@@ -17,10 +17,10 @@ import { ReadOnly } from './details/ReadOnly';
 import { emailConfirmationModalStyles } from './details/style';
 
 const getCentralOfficeTime = (hearing) => {
-  const newTime = `${moment(hearing.scheduledFor).format('YYYY-MM-DD')}T${hearing.scheduledTimeString}`;
+  const newTime = `${moment(hearing.scheduledFor).format('YYYY-MM-DD')} ${hearing.scheduledTimeString}`;
 
   return moment.
-    tz(newTime, hearing.regionalOfficeTimezone).
+    tz(newTime, 'YYYY-MM-DD HH:mm A', hearing.regionalOfficeTimezone).
     tz('America/New_York').
     format('HH:mm');
 };
@@ -38,7 +38,7 @@ const formatTimeString = (hearing, timeWasEdited) => {
 
   let timeString = `${moment(centralOfficeTime, 'hh:mm').format('h:mm a')} ET`;
 
-  timeString += ` / ${moment(hearing.scheduledTimeString, 'hh:mm').format('h:mm a')} `;
+  timeString += ` / ${moment(hearing.scheduledTimeString, 'hh:mm a').format('h:mm a')} `;
   timeString += moment().
     tz(hearing.regionalOfficeTimezone).
     format('z');

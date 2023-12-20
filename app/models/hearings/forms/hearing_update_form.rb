@@ -43,7 +43,7 @@ class HearingUpdateForm < BaseHearingUpdateForm
 
   # rubocop:disable Metrics/MethodLength
   def hearing_updates
-    {
+    updates = {
       bva_poc: bva_poc,
       disposition: disposition,
       evidence_window_waived: evidence_window_waived,
@@ -64,6 +64,8 @@ class HearingUpdateForm < BaseHearingUpdateForm
       witness: witness,
       email_recipients_attributes: email_recipients_attributes
     }.compact
+
+    HearingTimeService.build_params_with_time(hearing, updates)
   end
   # rubocop:enable Metrics/MethodLength
 end
