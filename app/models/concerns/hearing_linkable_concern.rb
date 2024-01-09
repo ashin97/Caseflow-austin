@@ -6,7 +6,7 @@ module HearingLinkableConcern
   included do
     has_one :hearing_link, as: :hearing_linkable
 
-    delegate :linked_hearing, to: :hearing_link, allow_nil: true
+    delegate :linked_hearing, to: :hearing_link
   end
 
   def link_to_hearing(hearing)
