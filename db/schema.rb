@@ -965,13 +965,13 @@ ActiveRecord::Schema.define(version: 2024_01_09_134704) do
 
   create_table "hearing_links", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.bigint "hearing_id"
     t.bigint "hearing_linkable_id"
     t.string "hearing_linkable_type"
-    t.string "hearing_type"
+    t.bigint "linked_hearing_id"
+    t.string "linked_hearing_type"
     t.datetime "updated_at", null: false
-    t.index ["hearing_id", "hearing_type"], name: "hearing_linkable_items_association_idx"
     t.index ["hearing_linkable_id", "hearing_linkable_type"], name: "hearing_links_on_hearing_id_and_hearing_type"
+    t.index ["linked_hearing_id", "linked_hearing_type"], name: "hearing_linkable_items_association_idx"
   end
 
   create_table "hearing_locations", force: :cascade do |t|
