@@ -26,8 +26,7 @@ COPY . .
 RUN pwd && ls -lsa
 
 # Build dependencies
-RUN echo "export CURL_CA_BUNDLE=/etc/ssl/certs/ca-bundle.crt" >> ~/.bashrc && \
-    source ~/.bashrc && \
+RUN export CURL_CA_BUNDLE=/etc/ssl/certs/ca-bundle.crt && \
     apt -y update && \
     apt -y upgrade && \
     mkdir -p /usr/share/man/man1 && \
