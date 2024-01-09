@@ -48,6 +48,9 @@ class Hearing < CaseflowRecord
   has_many :email_events, class_name: "SentHearingEmailEvent"
   has_many :email_recipients, class_name: "HearingEmailRecipient"
 
+  has_many :hearing_links
+  has_many :linked_notifications, through: :hearing_links, source: :hearing_linkable, source_type: "Notification"
+
   class HearingDayFull < StandardError; end
 
   accepts_nested_attributes_for :hearing_issue_notes
@@ -238,10 +241,10 @@ class Hearing < CaseflowRecord
 
   def regional_office
     @regional_office ||= begin
-                            RegionalOffice.find!(regional_office_key)
-                         rescue RegionalOffice::NotFoundError
-                           nil
-                          end
+      RegionalOffice.find!(regional_office_key)
+    rescue RegionalOffice::NotFoundError
+      nil
+    end
   end
 
   def regional_office_key
