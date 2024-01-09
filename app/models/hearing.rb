@@ -48,7 +48,7 @@ class Hearing < CaseflowRecord
   has_many :email_events, class_name: "SentHearingEmailEvent"
   has_many :email_recipients, class_name: "HearingEmailRecipient"
 
-  has_many :hearing_links
+  has_many :hearing_links, foreign_key: :linked_hearing_id
   has_many :linked_notifications, through: :hearing_links, source: :hearing_linkable, source_type: "Notification"
 
   class HearingDayFull < StandardError; end

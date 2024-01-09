@@ -4,7 +4,8 @@
 # a specific hearing
 class HearingLink < CaseflowRecord
   belongs_to :hearing_linkable, polymorphic: true
-  has_one :hearing
+  belongs_to :linked_hearing, polymorphic: true
 
-  alias_attribute :linked_hearing, :hearing
+  alias_attribute :hearing, :linked_hearing
+  alias_attribute :linked_item, :hearing_linkable
 end

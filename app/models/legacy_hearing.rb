@@ -73,6 +73,9 @@ class LegacyHearing < CaseflowRecord
   has_many :email_events, class_name: "SentHearingEmailEvent", foreign_key: :hearing_id
   has_many :email_recipients, class_name: "HearingEmailRecipient", foreign_key: :hearing_id
 
+  has_many :hearing_links, foreign_key: :linked_hearing_id
+  has_many :linked_notifications, through: :hearing_links, source: :hearing_linkable, source_type: "Notification"
+
   alias_attribute :location, :hearing_location
   accepts_nested_attributes_for :hearing_location, reject_if: proc { |attributes| attributes.blank? }
   accepts_nested_attributes_for :email_recipients, reject_if: proc { |attributes| attributes.blank? }
