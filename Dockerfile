@@ -31,12 +31,12 @@ RUN apt -y update && \
     mkdir -p /usr/share/man/man1 && \
     mkdir /usr/share/man/man7 && \
     apt install -y ${BUILD} && \
-    wget - no-check-certificate https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+    wget - no-check-certificate -qO - https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
     apt -y update && \
-    wget - no-check-certificate https://deb.nodesource.com/setup_$(cat .nvmrc | cut -d "." -f 1).x | bash - && \
+    wget - no-check-certificate -qO - https://deb.nodesource.com/setup_$(cat .nvmrc | cut -d "." -f 1).x | bash - && \
     apt install -y ${CASEFLOW} &&  \
-    wget - no-check-certificate https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+    wget - no-check-certificate -qO - https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
     apt-get clean && apt-get autoclean && apt-get autoremove
 
