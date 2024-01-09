@@ -2,6 +2,9 @@
 
 class CreateHearingsLinkableJoinTable < Caseflow::Migration
   def change
+    # Question: Should the primary key be a composite key consisting of [hearing_id, hearing_linkable_id]?
+    # Pros: Faster read speeds
+    # Cons: Much slower insertions
     create_table :hearing_links, &:timestamps
 
     add_reference :hearing_links, :hearing, polymorphic: true, index: false
