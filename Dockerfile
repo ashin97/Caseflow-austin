@@ -31,12 +31,14 @@ RUN apt -y update && \
     mkdir -p /usr/share/man/man1 && \
     mkdir /usr/share/man/man7 && \
     apt install -y ${BUILD} && \
-    curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+    curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg && \
+    apt-key add pubkey.gpg && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
     apt -y update && \
     curl -sL https://deb.nodesource.com/setup_$(cat .nvmrc | cut -d "." -f 1).x | bash - && \
     apt install -y ${CASEFLOW} &&  \
-    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg && \
+    apt-key add pubkey.gpg && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
     apt-get clean && apt-get autoclean && apt-get autoremove
 
