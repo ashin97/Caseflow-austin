@@ -8,49 +8,38 @@ class CorrespondenceIntakeProcessor
 
     fail "Correspondence not found" if correspondence.blank?
 
-    success = true
+    parent_task = CorrespondenceIntakeTask.find_by(appeal_id: correspondence.id, type: CorrespondenceIntakeTask.name)
 
-    ActiveRecord::Base.transaction do
-      begin
-        create_correspondence_relations(intake_params, correspondence.id)
-        link_appeals_to_correspondence(intake_params, correspondence.id)
-        add_tasks_to_related_appeals(intake_params, current_user)
-        complete_waived_evidence_submission_tasks(intake_params)
-        create_tasks_not_related_to_appeals(intake_params, correspondence, current_user)
-        create_mail_tasks(intake_params, correspondence, current_user)
-      rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid
-        success = false
-        raise ActiveRecord::Rollback
-      end
-    end
+    return false if !correspondence_documents_efolder_uploader.upload_documents_to_claim_evidence(
+      correspondence,
+      current_user,
+      parent_task
+    )
 
-    success
-  end
-
-  def upload_documents_to_claim_evidence(correspondence, current_user)
-    if Rails.env.development? || Rails.env.demo? || Rails.env.test?
-      true
-    else
-      begin
-        correspondence.correspondence_documents.all.each do |doc|
-          ExternalApi::ClaimEvidenceService.upload_document(
-            doc.pdf_location,
-            veteran_by_correspondence.file_number,
-            doc.claim_evidence_upload_json
-          )
-        end
-
-        true
-      rescue StandardError => error
-        Rails.logger.error(error.to_s)
-        create_efolder_upload_failed_task(correspondence, current_user)
-
-        false
-      end
-    end
+    do_upload_success_actions(parent_task, intake_params, correspondence, current_user)
   end
 
   private
+
+  # :reek:LongParameterList
+  def do_upload_success_actions(parent_task, intake_params, correspondence, current_user)
+    ActiveRecord::Base.transaction do
+      parent_task.update!(status: Constants.TASK_STATUSES.completed)
+
+      create_correspondence_relations(intake_params, correspondence.id)
+      link_appeals_to_correspondence(intake_params, correspondence.id)
+      add_tasks_to_related_appeals(intake_params, current_user)
+      complete_waived_evidence_submission_tasks(intake_params)
+      create_tasks_not_related_to_appeals(intake_params, correspondence, current_user)
+      create_mail_tasks(intake_params, correspondence, current_user)
+    end
+
+    true
+  rescue StandardError => error
+    Rails.logger.error(error.full_message)
+
+    false
+  end
 
   def create_correspondence_relations(intake_params, correspondence_id)
     intake_params[:related_correspondence_uuids]&.map do |uuid|
@@ -75,7 +64,7 @@ class CorrespondenceIntakeProcessor
         {
           appeal: appeal,
           parent_id: appeal.root_task&.id,
-          assigned_to: data[:assigned_to].constantize.singleton,
+          assigned_to: class_for_assigned_to(data[:assigned_to]).singleton,
           instructions: data[:content]
         }, current_user
       )
@@ -91,20 +80,6 @@ class CorrespondenceIntakeProcessor
     end
   end
 
-  def create_efolder_upload_failed_task(correspondence, current_user)
-    rpt = ReviewPackageTask.find_by(appeal_id: correspondence.id, type: ReviewPackageTask.name)
-
-    euft = EfolderUploadFailedTask.find_or_create_by(
-      appeal_id: correspondence.id,
-      appeal_type: "Correspondence",
-      type: EfolderUploadFailedTask.name,
-      assigned_to: current_user,
-      parent_id: rpt.id
-    )
-
-    euft.update!(status: Constants.TASK_STATUSES.in_progress)
-  end
-
   def create_tasks_not_related_to_appeals(intake_params, correspondence, current_user)
     unrelated_task_data = intake_params[:tasks_not_related_to_appeal]
 
@@ -114,7 +89,7 @@ class CorrespondenceIntakeProcessor
       class_for_data(data).create_from_params(
         {
           parent_id: correspondence.root_task.id,
-          assigned_to: data[:assigned_to].constantize.singleton,
+          assigned_to: class_for_assigned_to(data[:assigned_to]).singleton,
           instructions: data[:content]
         }, current_user
       )
@@ -139,8 +114,16 @@ class CorrespondenceIntakeProcessor
     end
   end
 
+  def class_for_data(data)
+    task_class_for_type(data[:klass])
+  end
+
+  def correspondence_documents_efolder_uploader
+    @correspondence_documents_efolder_uploader ||= CorrespondenceDocumentsEfolderUploader.new
+  end
+
   def mail_task_class_for_type(task_type)
-    task_types = {
+    mail_task_types = {
       "Associated with Claims Folder": AssociatedWithClaimsFolderMailTask.name,
       "Change of address": AddressChangeMailTask.name,
       "Evidence or argument": EvidenceOrArgumentMailTask.name,
@@ -149,10 +132,51 @@ class CorrespondenceIntakeProcessor
       "VACOLS updated": VacolsUpdatedMailTask.name
     }.with_indifferent_access
 
+    mail_task_types[task_type]&.constantize
+  end
+
+  def task_class_for_type(task_type)
+    task_types = {
+      "AddressChangeMailTask": AddressChangeMailTask.name,
+      "AodMotionMailTask": AodMotionMailTask.name,
+      "AppealWithdrawalMailTask": AppealWithdrawalMailTask.name,
+      "CavcCorrespondenceMailTask": CavcCorrespondenceMailTask.name,
+      "ClearAndUnmistakeableErrorMailTask": ClearAndUnmistakeableErrorMailTask.name,
+      "CongressionalInterestMailTask": CongressionalInterestMailTask.name,
+      "ControlledCorrespondenceMailTask": ControlledCorrespondenceMailTask.name,
+      "DeathCertificateMailTask": DeathCertificateMailTask.name,
+      "DocketSwitchMailTask": DocketSwitchMailTask.name,
+      "EvidenceOrArgumentMailTask": EvidenceOrArgumentMailTask.name,
+      "ExtensionRequestMailTask": ExtensionRequestMailTask.name,
+      "FoiaRequestMailTask": FoiaRequestMailTask.name,
+      "HearingPostponementRequestMailTask": HearingPostponementRequestMailTask.name,
+      "HearingRelatedMailTask": HearingRelatedMailTask.name,
+      "HearingWithdrawalRequestMailTask": HearingWithdrawalRequestMailTask.name,
+      "OtherMotionMailTask": OtherMotionMailTask.name,
+      "PowerOfAttorneyRelatedMailTask": PowerOfAttorneyRelatedMailTask.name,
+      "PrivacyActRequestMailTask": PrivacyActRequestMailTask.name,
+      "PrivacyComplaintMailTask": PrivacyComplaintMailTask.name,
+      "ReconsiderationMotionMailTask": ReconsiderationMotionMailTask.name,
+      "ReturnedUndeliverableCorrespondenceMailTask": ReturnedUndeliverableCorrespondenceMailTask.name,
+      "StatusInquiryMailTask": StatusInquiryMailTask.name
+    }.with_indifferent_access
+
     task_types[task_type]&.constantize
   end
 
-  def class_for_data(data)
-    data[:klass]&.constantize
+  def class_for_assigned_to(assigned_to)
+    available_assignees = {
+      "AodTeam": AodTeam.name,
+      "BvaDispatch": BvaDispatch.name,
+      "CaseReview": CaseReview.name,
+      "CavcLitigationSupport": CavcLitigationSupport.name,
+      "ClerkOfTheBoard": ClerkOfTheBoard.name,
+      "Colocated": Colocated.name,
+      "HearingAdmin": HearingAdmin.name,
+      "LitigationSupport": LitigationSupport.name,
+      "PrivacyTeam": PrivacyTeam.name
+    }.with_indifferent_access
+
+    available_assignees[assigned_to]&.constantize
   end
 end
