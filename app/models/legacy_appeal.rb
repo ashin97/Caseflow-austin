@@ -12,11 +12,20 @@ class LegacyAppeal < CaseflowRecord
   include AssociatedVacolsModel
   include BgsService
   include CachedAttributes
+
+
+
+
+
   include AddressMapper
   include Taskable
   include PrintsTaskTree
   include HasTaskHistory
   include AppealAvailableHearingLocations
+
+
+
+
   include HearingRequestTypeConcern
   include AppealNotificationReportConcern
 
