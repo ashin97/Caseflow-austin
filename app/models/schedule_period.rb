@@ -56,6 +56,9 @@ class SchedulePeriod < CaseflowRecord
 
   def end_confirming_schedule
     clear_submitted_to_vacols
+
+
+
     @confirming_to_vacols = false
     submitting_to_vacols
   end
