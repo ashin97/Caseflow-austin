@@ -2,6 +2,8 @@
 
 class RequestDecisionIssue < CaseflowRecord
   belongs_to :request_issue
+
+
   belongs_to :decision_issue
 
   validates :request_issue, :decision_issue, presence: true
