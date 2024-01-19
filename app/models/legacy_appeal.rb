@@ -33,6 +33,9 @@ class LegacyAppeal < CaseflowRecord
   has_many :dispatch_tasks, foreign_key: :appeal_id, class_name: "Dispatch::Task"
   has_many :worksheet_issues, foreign_key: :appeal_id
   has_many :appeal_views, as: :appeal
+
+
+
   has_many :claims_folder_searches, as: :appeal
   has_many :tasks, as: :appeal
   has_many :decision_documents, as: :appeal
