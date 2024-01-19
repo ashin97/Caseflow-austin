@@ -13,6 +13,10 @@ class RampReview < CaseflowRecord
   enum option_selected: {
     supplemental_claim: "supplemental_claim",
     higher_level_review: "higher_level_review",
+
+
+
+
     higher_level_review_with_hearing: "higher_level_review_with_hearing",
     appeal: "appeal"
   }
