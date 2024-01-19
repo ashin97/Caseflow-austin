@@ -74,6 +74,9 @@ class LegacyAppeal < CaseflowRecord
   vacols_attr_accessor :veteran_name_suffix
   vacols_attr_accessor :appellant_first_name, :appellant_middle_initial
   vacols_attr_accessor :appellant_last_name, :appellant_name_suffix
+
+
+
   vacols_attr_accessor :outcoder_first_name, :outcoder_middle_initial, :outcoder_last_name
   vacols_attr_accessor :appellant_relationship, :appellant_ssn
   vacols_attr_accessor :hearing_request_type, :video_hearing_requested
