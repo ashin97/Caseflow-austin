@@ -81,6 +81,9 @@ class LegacyAppeal < CaseflowRecord
   vacols_attr_accessor :appellant_relationship, :appellant_ssn
   vacols_attr_accessor :hearing_request_type, :video_hearing_requested
   vacols_attr_accessor :hearing_requested, :hearing_held
+
+
+
   vacols_attr_accessor :regional_office_key
   vacols_attr_accessor :insurance_loan_number
   vacols_attr_accessor :notification_date, :nod_date, :soc_date, :form9_date, :ssoc_dates
