@@ -6,4 +6,8 @@
 
 class DependentClaimant < BgsRelatedClaimant
   bgs_attr_accessor :relationship
+
+
+
+
 end
