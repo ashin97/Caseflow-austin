@@ -29,6 +29,9 @@ class LegacyAppeal < CaseflowRecord
   include HearingRequestTypeConcern
   include AppealNotificationReportConcern
 
+
+
+
   belongs_to :appeal_series
   has_many :dispatch_tasks, foreign_key: :appeal_id, class_name: "Dispatch::Task"
   has_many :worksheet_issues, foreign_key: :appeal_id
