@@ -21,6 +21,11 @@ class SchedulePeriod < CaseflowRecord
 
 
 
+
+
+
+
+
   has_many :non_availabilities
 
   delegate :full_name, to: :user, prefix: true
