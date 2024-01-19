@@ -23,6 +23,9 @@ class CurrentRating < Rating
         promulgation_date: data[:prmlgn_dt],
         rating_profile: data
       )
+
+
+
     end
   end
 end
