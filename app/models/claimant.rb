@@ -27,6 +27,9 @@ class Claimant < CaseflowRecord
            :advanced_on_docket_motion_granted?,
            :name,
            to: :person
+
+
+
   delegate :first_name,
            :middle_name,
            :last_name,
