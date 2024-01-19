@@ -26,6 +26,10 @@ class Docket
 
     scope = scope.nonpriority if priority == false
 
+
+
+
+
     scope.order("appeals.receipt_date")
   end
 
