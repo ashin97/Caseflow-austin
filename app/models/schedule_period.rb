@@ -63,6 +63,10 @@ class SchedulePeriod < CaseflowRecord
     submitting_to_vacols
   end
 
+
+
+
+
   S3_SUB_BUCKET = "hearing_schedule"
 
   def validate_schedule_period
