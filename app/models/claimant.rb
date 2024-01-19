@@ -15,6 +15,9 @@ class Claimant < CaseflowRecord
     where(id: UnrecognizedAppellant.order(:id).find_by(claimant: claimant)&.id)
   }, dependent: :destroy
 
+
+
+
   validates :participant_id,
             uniqueness: { scope: [:decision_review_id, :decision_review_type],
                           on: :create }
