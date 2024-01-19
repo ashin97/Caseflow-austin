@@ -87,6 +87,9 @@ class LegacyAppeal < CaseflowRecord
   vacols_attr_accessor :regional_office_key
   vacols_attr_accessor :insurance_loan_number
   vacols_attr_accessor :notification_date, :nod_date, :soc_date, :form9_date, :ssoc_dates
+
+
+
   vacols_attr_accessor :certification_date, :case_review_date, :notice_of_death_date
   vacols_attr_accessor :type
   vacols_attr_accessor :disposition, :decision_date, :status
