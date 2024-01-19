@@ -11,6 +11,10 @@ class Rating
 
   class NilRatingProfileListError < StandardError
     def ignorable?
+
+
+
+
       true
     end
   end
