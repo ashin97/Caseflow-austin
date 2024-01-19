@@ -46,7 +46,6 @@ class Person < CaseflowRecord
         person = person_with_pid if person_with_pid
       end
       person.update_cached_attributes! if person.found?
-      person
     end
   end
 
