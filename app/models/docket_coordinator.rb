@@ -16,6 +16,9 @@ class DocketCoordinator
     @dockets ||= all_dockets
   end
 
+
+
+
   def docket_proportions
     return @docket_proportions if @docket_proportions
 
