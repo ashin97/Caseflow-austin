@@ -8,6 +8,14 @@ class RoundRobinTaskDistributor
 
   attr_accessor :assignee_pool, :task_class
 
+
+
+
+
+
+
+
+
   def initialize(assignee_pool:, task_class:)
     @assignee_pool = assignee_pool.select(&:active?)
     @task_class = task_class
