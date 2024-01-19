@@ -14,6 +14,9 @@ class RequestDecisionIssue < CaseflowRecord
   amoeba do
     enable
     exclude_association :request_issue_id
+
+
+
     exclude_association :decision_issue_id
   end
 end
