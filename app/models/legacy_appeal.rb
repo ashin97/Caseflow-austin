@@ -96,6 +96,8 @@ class LegacyAppeal < CaseflowRecord
   vacols_attr_accessor :location_code
   vacols_attr_accessor :file_type
   vacols_attr_accessor :case_record
+
+
   vacols_attr_accessor :number_of_issues
   vacols_attr_accessor :outcoding_date
   vacols_attr_accessor :last_location_change_date
