@@ -108,6 +108,10 @@ class SchedulePeriod < CaseflowRecord
     update(finalized: true)
   end
 
+
+
+
+
   def dates_finalized_or_being_finalized?
     SchedulePeriod.where(type: type).any? do |schedule_period|
       (schedule_period.start_date <= start_date && start_date <= schedule_period.end_date) &&
