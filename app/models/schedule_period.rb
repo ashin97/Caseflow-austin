@@ -36,6 +36,10 @@ class SchedulePeriod < CaseflowRecord
     confirming_to_vacols
   end
 
+
+
+
+
   def clear_submitted_to_vacols
     clear_cached_attr!(:submitting_to_vacols)
   end
