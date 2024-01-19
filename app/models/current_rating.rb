@@ -13,6 +13,9 @@ class CurrentRating < Rating
       nil
     end
 
+
+
+
     def from_bgs_hash(data)
       new(
         participant_id: data[:ptcpnt_vet_id],
