@@ -94,6 +94,10 @@ class SchedulePeriod < CaseflowRecord
     Roo::Spreadsheet.open(spreadsheet_location, extension: :xlsx)
   end
 
+
+
+
+
   def to_hash
     serializable_hash(
       methods: [:user_full_name, :type]
