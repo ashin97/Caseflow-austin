@@ -22,6 +22,8 @@ class Claimant < CaseflowRecord
             uniqueness: { scope: [:decision_review_id, :decision_review_type],
                           on: :create }
 
+
+
   delegate :advanced_on_docket?,
            :advanced_on_docket_based_on_age?,
            :advanced_on_docket_motion_granted?,
