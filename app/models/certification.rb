@@ -12,6 +12,9 @@ class Certification < CaseflowRecord
   def async_start!
     return certification_status unless can_be_updated?
 
+
+
+
     update!(
       v2: true,
       loading_data: true,
