@@ -38,6 +38,9 @@ class LegacyAppeal < CaseflowRecord
   has_many :decision_documents, as: :appeal
   has_one :special_issue_list, as: :appeal
   has_many :record_synced_by_job, as: :record
+
+
+
   has_many :available_hearing_locations, as: :appeal, class_name: "AvailableHearingLocations"
   has_many :claimants, -> { Claimant.none }
   has_one :cached_vacols_case, class_name: "CachedAppeal", foreign_key: :vacols_id, primary_key: :vacols_id
