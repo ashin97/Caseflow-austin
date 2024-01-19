@@ -86,6 +86,9 @@ class SchedulePeriod < CaseflowRecord
     S3_SUB_BUCKET + "/" + file_name
   end
 
+
+
+
   def spreadsheet
     S3Service.fetch_file(s3_file_location, spreadsheet_location)
     Roo::Spreadsheet.open(spreadsheet_location, extension: :xlsx)
