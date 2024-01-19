@@ -246,6 +246,9 @@ class HearingDay < CaseflowRecord
       )
     end
 
+
+
+
     hearings.each do |hearing|
       hearing.update!(
         **only_changed(room: room, bva_poc: bva_poc, judge_id: judge&.id)
