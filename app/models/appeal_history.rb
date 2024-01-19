@@ -15,6 +15,9 @@ class AppealHistory
     @appeal_series ||= fetch_appeal_series
   end
 
+
+
+
   private
 
   def fetch_appeals
