@@ -6,6 +6,10 @@ class MembershipRequestMailBuilder
   end
 
   def send_email_request_approved
+
+
+
+
     fail NotImplementedError, "Subclasses must implement this method"
   end
 
