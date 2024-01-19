@@ -119,6 +119,10 @@ class SchedulePeriod < CaseflowRecord
     end
   end
 
+
+
+
+
   def can_be_finalized?
     nbr_of_days = updated_at.beginning_of_day - Time.zone.today.beginning_of_day
     ((nbr_of_days < 5) && !dates_finalized_or_being_finalized?) && !finalized
