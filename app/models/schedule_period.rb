@@ -75,6 +75,9 @@ class SchedulePeriod < CaseflowRecord
     end
   end
 
+
+
+
   def spreadsheet_location
     File.join(Rails.root, "tmp", "hearing_schedule", "spreadsheets", file_name)
   end
