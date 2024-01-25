@@ -55,7 +55,7 @@ export const hasChangedLevers = (state) => changedLevers(state).length > 0;
 export const getLeversByGroup = createSelector(
   [getLeversByGroupConstant],
   (leversByGroup) => {
-    return leversByGroup;
+    return leversByGroup.sort((leverA, leverB) => leverA.lever_group_order - leverB.lever_group_order);
   }
 );
 
