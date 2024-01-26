@@ -11,27 +11,12 @@
         "description": "Correspondence assigned to you:",
         "columns": [
           {
-            "name": "Veteran Details",
+            "name": "typeColumn",
             "filterable": false,
             "filter_options": []
           },
           {
-            "name": "CM Packet Number",
-            "filterable": false,
-            "filter_options": []
-          },
-          {
-            "name": "VA DOR",
-            "filterable": false,
-            "filter_options": []
-          },
-          {
-            "name": "Days Waiting",
-            "filterable": false,
-            "filter_options": []
-          },
-          {
-            "name": "Notes",
+            "name": "typeColumn",
             "filterable": false,
             "filter_options": []
           }
@@ -489,32 +474,7 @@
         "description": "Correspondence in progress that are assigned to you:",
         "columns": [
           {
-            "name": "Veteran Details",
-            "filterable": false,
-            "filter_options": []
-          },
-          {
-            "name": "CM Packet Number",
-            "filterable": false,
-            "filter_options": []
-          },
-          {
-            "name": "VA DOR",
-            "filterable": false,
-            "filter_options": []
-          },
-          {
-            "name": "Tasks",
-            "filterable": false,
-            "filter_options": []
-          },
-          {
-            "name": "Days Waiting",
-            "filterable": false,
-            "filter_options": []
-          },
-          {
-            "name": "Notes",
+            "name": "typeColumn",
             "filterable": false,
             "filter_options": []
           }
@@ -624,27 +584,7 @@
         "description": "Completed correspondence:",
         "columns": [
           {
-            "name": "Veteran Details",
-            "filterable": false,
-            "filter_options": []
-          },
-          {
-            "name": "CM Packet Number",
-            "filterable": false,
-            "filter_options": []
-          },
-          {
-            "name": "VA DOR",
-            "filterable": false,
-            "filter_options": []
-          },
-          {
-            "name": "Completion Date",
-            "filterable": false,
-            "filter_options": []
-          },
-          {
-            "name": "Notes",
+            "name": "typeColumn",
             "filterable": false,
             "filter_options": []
           }

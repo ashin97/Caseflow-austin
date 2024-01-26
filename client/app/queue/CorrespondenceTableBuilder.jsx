@@ -269,7 +269,7 @@ const QueueTableBuilder = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    config: state.intakeCorrespondence.correspondenceConfig,
+    config: state.intakeCorrespondence.correspondenceConfig.correspondence_config,
     organizations: state.ui.organizations,
     isVhaOrg: isActiveOrganizationVHA(state),
     userCanBulkAssign: state.ui.activeOrganization.userCanBulkAssign,
