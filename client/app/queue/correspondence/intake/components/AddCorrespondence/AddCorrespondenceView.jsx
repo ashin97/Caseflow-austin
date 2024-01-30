@@ -8,13 +8,15 @@ import Button from '../../../../../components/Button';
 import RadioField from '../../../../../components/RadioField';
 import ApiUtil from '../../../../../util/ApiUtil';
 import CorrespondencePaginationWrapper from '../../../CorrespondencePaginationWrapper';
+import AddLetter from '../AddCorrespondence/AddLetter';
 import {
   loadCurrentCorrespondence,
   loadCorrespondences,
   loadVeteranInformation,
   updateRadioValue,
   saveCheckboxState,
-  clearCheckboxState
+  clearCheckboxState,
+  setResponseLetters
 } from '../../../correspondenceReducer/correspondenceActions';
 
 const RELATED_NO = '0';
@@ -45,7 +47,6 @@ class AddCorrespondenceView extends React.Component {
       this.props.loadCurrentCorrespondence(currentCorrespondence);
       this.props.loadCorrespondences(correspondences);
       this.props.loadVeteranInformation(veteranInformation);
-
     }).
       catch((err) => {
         // allow HTTP errors to fall on the floor via the console.
@@ -198,14 +199,10 @@ class AddCorrespondenceView extends React.Component {
         <h1 style={{ marginBottom: '20px' }}>Add Related Correspondence</h1>
         <p style={{ marginTop: '0px' }}>Add any related correspondence to the mail package that is in progress.</p>
         <h2 style={{ margin: '30px auto 20px auto' }}>Response Letter</h2>
-        <div style={{ width: '80%', marginBottom: '30px' }}>
-          <Button
-            type="button"
-            name="addLetter"
-            className={['cf-left-side']}>
-          + Add letter
-          </Button>
-        </div>
+        {/* add letter here */}
+        <AddLetter
+          onContinueStatusChange={this.props.onContinueStatusChange}
+        />
         <hr style={{ borderTop: '1px solid #d6d7d9' }} />
         <h2 style={{ margin: '30px auto 20px auto' }}>Associate with prior Mail</h2>
         <p style={{ marginTop: '0px', marginBottom: '-7px' }}>Is this correspondence related to prior mail?</p>
@@ -253,7 +250,9 @@ AddCorrespondenceView.propTypes = {
   onContinueStatusChange: PropTypes.func,
   onCheckboxChange: PropTypes.func.isRequired,
   clearCheckboxState: PropTypes.func.isRequired,
-  checkboxes: PropTypes.array
+  checkboxes: PropTypes.array,
+  setResponseLetters: PropTypes.func,
+  currentLetters: PropTypes.number
 };
 
 const mapStateToProps = (state) => ({
@@ -262,6 +261,7 @@ const mapStateToProps = (state) => ({
   correspondences: state.intakeCorrespondence.correspondences,
   radioValue: state.intakeCorrespondence.radioValue,
   checkboxes: state.intakeCorrespondence.relatedCorrespondences,
+  currentLetters: state.intakeCorrespondence.responseLetters,
 });
 
 const mapDispatchToProps = (dispatch) => (
@@ -271,7 +271,8 @@ const mapDispatchToProps = (dispatch) => (
     loadVeteranInformation,
     updateRadioValue,
     saveCheckboxState,
-    clearCheckboxState
+    clearCheckboxState,
+    setResponseLetters
   }, dispatch)
 );
 
