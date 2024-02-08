@@ -1029,7 +1029,7 @@ describe Task, :all_dbs do
         FeatureToggle.enable!(:overtime_revamp)
       end
 
-      let(:user) { create(:user) }  #Let user be someone that is no registered to the toggle feature list
+      let(:user) { create(:user) } # Let user be someone that is no registered to the toggle feature list
       shared_examples "overtime status is changed because user is not on the feature toggle list" do
         it "clears overtime status on reassignment because user is not on the feature toggle list" do
           expect(appeal.overtime?).to be true
@@ -1994,6 +1994,66 @@ describe Task, :all_dbs do
       let(:assignee) { organization }
       it "returns true" do
         expect(subject).to be_truthy
+      end
+    end
+  end
+
+  describe "Correspondence Tasks" do
+    context "Correspondence Intake Task" do
+      it "has a task_url" do
+        cit = create(:correspondence_intake_task)
+        expect(cit.task_url).to eq("/queue/correspondence/#{cit.correspondence.uuid}/intake")
+      end
+    end
+
+    context "Review Package Task" do
+      it "has a task_url" do
+        correspondence = create(:correspondence)
+        rpt = ReviewPackageTask.find_or_create_by(
+          appeal_id: correspondence.id,
+          assigned_to: MailTeamSupervisor.singleton,
+          appeal_type: "Correspondence"
+        )
+
+        expect(rpt.task_url).to eq("/queue/correspondence/#{correspondence.uuid}/review_package")
+      end
+    end
+
+    context "eFolder Upload Failed Task" do
+      it "has a review_package task_url if parent is review package task" do
+        correspondence = create(:correspondence)
+        rpt = ReviewPackageTask.find_or_create_by(
+          appeal_id: correspondence.id,
+          assigned_to: MailTeamSupervisor.singleton,
+          appeal_type: "Correspondence"
+        )
+
+        uft = EfolderUploadFailedTask.create(
+          appeal_id: correspondence.id,
+          assigned_to: MailTeamSupervisor.singleton,
+          appeal_type: "Correspondence",
+          parent_id: rpt.id
+        )
+
+        expect(uft.task_url).to eq("/queue/correspondence/#{correspondence.uuid}/review_package")
+      end
+
+      it "has an intake task_url if parent is correspondence intake task" do
+        correspondence = create(:correspondence)
+        cit = CorrespondenceIntakeTask.find_or_create_by(
+          appeal_id: correspondence.id,
+          assigned_to: MailTeamSupervisor.singleton,
+          appeal_type: "Correspondence"
+        )
+
+        uft = EfolderUploadFailedTask.create(
+          appeal_id: correspondence.id,
+          assigned_to: MailTeamSupervisor.singleton,
+          appeal_type: "Correspondence",
+          parent_id: cit.id
+        )
+
+        expect(uft.task_url).to eq("/queue/correspondence/#{correspondence.uuid}/intake")
       end
     end
   end

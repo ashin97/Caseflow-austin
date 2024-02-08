@@ -20,6 +20,9 @@
     userCanViewHearingSchedule: current_user.can_view_hearing_schedule?,
     userCanViewOvertimeStatus: current_user.can_view_overtime_status?,
     userCanViewEditNodDate: current_user.can_view_edit_nod_date?,
+    isMailTeamUser: current_user.mail_team_user?,
+    isMailSupervisor: current_user.mail_supervisor?,
+    isMailSuperUser: current_user.mail_superuser?,
     canEditCavcRemands: current_user.can_edit_cavc_remands?,
     canEditCavcDashboards: current_user.can_edit_cavc_dashboards?,
     canViewCavcDashboards: current_user.can_view_cavc_dashboards?,
@@ -57,7 +60,8 @@
       cc_appeal_workflow: FeatureToggle.enabled?(:cc_appeal_workflow, user: current_user),
       metricsBrowserError: FeatureToggle.enabled?(:metrics_browser_error, user: current_user),
       cc_vacatur_visibility: FeatureToggle.enabled?(:cc_vacatur_visibility, user: current_user),
-      additional_remand_reasons: FeatureToggle.enabled?(:additional_remand_reasons, user: current_user)
+      additional_remand_reasons: FeatureToggle.enabled?(:additional_remand_reasons, user: current_user),
+      acd_cases_tied_to_judges_no_longer_with_board: FeatureToggle.enabled?(:acd_cases_tied_to_judges_no_longer_with_board, user: current_user)
     }
   }) %>
 <% end %>

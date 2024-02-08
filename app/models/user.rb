@@ -95,6 +95,18 @@ class User < CaseflowRecord # rubocop:disable Metrics/ClassLength
     can_any_of_these_roles?(["Build HearSched", "Edit HearSched", "RO ViewHearSched", "VSO", "Hearing Prep"])
   end
 
+  def mail_team_user?
+    organizations.include?(MailTeam.singleton)
+  end
+
+  def mail_supervisor?
+    organizations.include?(MailTeamSupervisor.singleton)
+  end
+
+  def mail_superuser?
+    organizations_users.where(admin: true, organization_id: MailTeam.singleton.id || BvaIntake.singleton.id).any?
+  end
+
   def can_assign_hearing_schedule?
     can_any_of_these_roles?(["Edit HearSched", "Build HearSched"])
   end
@@ -415,6 +427,14 @@ class User < CaseflowRecord # rubocop:disable Metrics/ClassLength
     end
   end
 
+  def correspondence_queue_tabs
+    [
+      correspondence_assigned_tasks_tab,
+      correspondence_in_progress_tasks_tab,
+      correspondence_completed_tasks_tab
+    ]
+  end
+
   def self.default_active_tab
     Constants.QUEUE_CONFIG.INDIVIDUALLY_ASSIGNED_TASKS_TAB_NAME
   end
@@ -429,6 +449,18 @@ class User < CaseflowRecord # rubocop:disable Metrics/ClassLength
 
   def completed_tasks_tab
     ::CompletedTasksTab.new(assignee: self, show_regional_office_column: show_regional_office_in_queue?)
+  end
+
+  def correspondence_assigned_tasks_tab
+    ::CorrespondenceAssignedTasksTab.new(assignee: self)
+  end
+
+  def correspondence_in_progress_tasks_tab
+    ::CorrespondenceInProgressTasksTab.new(assignee: self)
+  end
+
+  def correspondence_completed_tasks_tab
+    ::CorrespondenceCompletedTasksTab.new(assignee: self)
   end
 
   def can_edit_unrecognized_poa?
@@ -508,6 +540,7 @@ class User < CaseflowRecord # rubocop:disable Metrics/ClassLength
 
   class << self
     attr_writer :authentication_service
+
     delegate :authenticate_vacols, to: :authentication_service
 
     # Empty method used for testing purposes (required)
