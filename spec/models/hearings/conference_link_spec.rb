@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 describe ConferenceLink do
-  URL_HOST = "example.va.gov"
-  URL_PATH = "/sample"
-  PIN_KEY = "mysecretkey"
+  let(:hearing_day) { create(:hearing_day) }
+  let(:created_by_user) { create(:user) }
 
   before do
     allow(ENV).to receive(:[]).and_call_original
