@@ -2,12 +2,7 @@
 
 FactoryBot.define do
   factory :special_issue_list do
-    trait :ama do
-      appeal
-    end
-
-    trait :legacy do
-      appeal { create(:legacy_appeal, vacols_case: create(:case)) }
-    end
+    military_sexual_trauma { true }
+    appeal_type { "Appeal" }
   end
 end
