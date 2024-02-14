@@ -2,6 +2,9 @@
 
 FactoryBot.define do
   factory :special_issue_list do
+    military_sexual_trauma { true }
+    appeal_type { "Appeal" }
+
     trait :ama do
       appeal
     end
