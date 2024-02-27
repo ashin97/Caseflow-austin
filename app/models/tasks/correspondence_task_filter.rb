@@ -45,7 +45,6 @@ class CorrespondenceTaskFilter < TaskFilter
     end
 
     task_column_params.each do |param|
-      # binding.pry
       value_hash = Rack::Utils.parse_nested_query(param).deep_symbolize_keys
       result = result.merge(filter_by_task(value_hash[:val]))
     end
