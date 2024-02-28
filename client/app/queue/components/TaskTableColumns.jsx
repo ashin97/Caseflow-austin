@@ -266,8 +266,16 @@ export const veteranDetails = () => {
         </a>;
       }
 
+      // pass in the default taskUrl unless any of the if conditions are met
+      let taskUrl = task.taskUrl;
+
+      if (task.label === 'Efolder Upload Failed Task') {
+        taskUrl = `${task.taskUrl.split('/').slice(0, 4).
+          join('/') }/review_package`;
+      }
+
       return <a
-        href={task.taskUrl}
+        href={taskUrl}
         id="task-link"
         aria-label={`${task.label } Link`}
       >
@@ -276,19 +284,6 @@ export const veteranDetails = () => {
     },
   };
 };
-
-/*
-    header: COPY.CASE_LIST_TABLE_TASKS_COLUMN_TITLE,
-    name: QUEUE_CONFIG.COLUMNS.TASK_TYPE.name,
-    enableFilter: true,
-    tableData: tasks,
-    columnName: 'label',
-    anyFiltersAreSet: true,
-    customFilterLabels: CO_LOCATED_ADMIN_ACTIONS,
-    filterOptions,
-    label: 'Filter by task',
-    valueName: 'label',
-*/
 
 export const vaDor = () => {
   return {
